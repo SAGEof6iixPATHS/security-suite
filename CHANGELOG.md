@@ -4,6 +4,47 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-26
+
+A security + capability release: five real security fixes hardening the scan
+inputs and forwarding paths, a large test-coverage jump, and the first piece of
+entity-aware analysis — a provenance graph that records how each finding was
+reached.
+
+### Added
+
+- **Entity provenance graph (`core/entities.py`).** Every discovered thing is now
+  an `Entity` linked to the entity it came from, collected in an `EntityGraph`
+  (`10.0.0.5 → 445/tcp → CVE-2017-0144`), so a report can show *how we got here*
+  instead of a flat finding list. Identity is `(type, value)` with automatic
+  dedup, cycle-safe `ancestry()`, and sticky in-scope resolution. Prerequisite
+  for correlation rules and a module registry. (#12)
+
+### Security
+
+- **Blocked SSRF via OpenAPI spec URLs and spec-supplied servers** in apisec —
+  spec locations and the `servers` they declare are now validated before any
+  request is made. (#5 path)
+- **Required TLS 1.2+ for syslog/SIEM forwarding**, so events are no longer sent
+  over downgradeable transport.
+- **Validated phishing campaign and tracking ids** before they are used, closing
+  an injection path through attacker-influenced identifiers.
+- **Scrubbed untrusted values before logging** to prevent log injection, and
+  repaired `CacheEntry.__hash__`.
+- **Cleared the CodeQL alerts** raised across the new code.
+
+### Testing
+
+- Coverage for the exploit/remediation execution paths, the RedBlue
+  orchestrator autonomous loop, CVE enrichment, the SSL/XSS/SQLi web scanners,
+  and persistence, scoring, ROE, ATT&CK, password and OpenAPI parsing.
+
+### Maintenance
+
+- Pointed all repository URLs at `TheSecuredAnalyst`. (#8)
+- Bumped CI actions: `checkout` 4→7, `setup-python` 5→7, `upload-artifact` 4→7,
+  `codeql-action` 3→4.37.3. (Dependabot #2, #3, #7, #10)
+
 ## [0.2.0] - 2026-07-10
 
 A hardening release focused on trustworthiness: two real security fixes, a green
