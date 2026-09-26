@@ -4,6 +4,34 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Community-extensible correlation engine (`modules/correlation/`).** Turns
+  co-occurring findings into single, higher-signal correlations via **declarative
+  YAML rules** (`rules/correlation/`) instead of hardcoded Python — so detections
+  can be contributed and reviewed the way Nuclei templates are. Rules are either
+  *flat* (predicates matched anywhere in a run) or *host-scoped*, which groups
+  findings by the anchor entity they trace back to in the entity graph and emits
+  the full provenance chain (`10.0.0.5 → 445/tcp → CVE-2017-0144`). Ships with a
+  starter pack of five rules (three migrated from the previously hardcoded attack
+  patterns, plus two provenance-aware ones) and a contributor guide.
+- **Entity-graph builder (`modules/correlation/graph_builder.py`)** that turns a
+  run's scan results into a provenance graph (`target → host → service/url/
+  vulnerability`), so **`secsuite correlate` now activates host-scoped rules
+  live** — findings trace to a shared host anchor and correlations carry the
+  chain that led to them. Rules can anchor on multiple host types
+  (`[ip_address, hostname, domain]`).
+- **CVE enrichment in `correlate` (`modules/correlation/enrich.py`).** Looks up
+  CVEs for the services the port scan discovered and nests each under its service
+  in the graph (`host → 445/tcp → CVE-2017-0144`), so vulnerability-based rules
+  like `critical-vuln-on-exposed-host` fire in the CLI path too. Toggle with
+  `--cves/--no-cves`.
+- **`secsuite correlate <target>`** to run the rules over a scan, and
+  **`secsuite rules list` / `secsuite rules validate`** to inspect and validate
+  the rule library (including contributed rules).
+
 ## [0.3.0] - 2026-09-26
 
 A security + capability release: five real security fixes hardening the scan
