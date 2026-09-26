@@ -214,6 +214,8 @@ Core features work without any API keys. For local AI with no keys, use Ollama (
 Turn a pile of findings into attack paths. Correlation rules are declarative YAML
 (`rules/correlation/`), so anyone can contribute a detection — no code required.
 
+![SecSuite correlation demo](docs/correlation-demo.svg)
+
 ```bash
 secsuite correlate example.com              # run the rule pack over a scan
 secsuite correlate example.com --json out.json
